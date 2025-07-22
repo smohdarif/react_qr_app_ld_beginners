@@ -13,7 +13,7 @@ const qrCodeHome = ({ flags }) => {
       <br />
       <span style={{ color: 'black' }}><center>Scan me!</center></span>
       <div className="qr-wrapper">
-        <QRCode value={QR_URL} />
+        <QRCode value={"https://smohdarif.github.io/react_qr_app_ld_beginners/"} />
       </div>
     </div>
   ) : (
