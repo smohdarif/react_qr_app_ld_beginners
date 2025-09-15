@@ -1,0 +1,25 @@
+# This file is read by ld-find-code-refs.
+# We keep 'projKey' supplied by the Action input, so we DO NOT put 'projects:' here
+# (that would conflict with --projKey).
+
+# Optional but recommended – tighten false positives only if you want:
+# delimiters:
+#   disableDefaults: false
+
+# Aliases visible to the scanner:
+aliases:
+  # Map kebab-case flag keys to camelCase React usages (release-heart ↔ releaseHeart)
+  - type: camelcase
+
+  # Match code like: flags.releaseHeart
+  - type: regex
+    pattern: 'flags\\.([A-Za-z0-9_]+)'
+    subst: '$1'
+
+  # (Optional) If you sometimes rename 'flags' (e.g., const { flags: f } = props; f.releaseHeart):
+  # - type: regex
+  #   pattern: '(?:^|[^A-Za-z0-9_])([A-Za-z0-9_]+)\\.([A-Za-z0-9_]+)'
+  #   subst: '$2'
+
+# Nice-to-have UX in LaunchDarkly (shows a little more code around matches)
+contextLines: 2
