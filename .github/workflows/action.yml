@@ -1,6 +1,11 @@
-## Test
-on: push
+# Test
 name: Find LaunchDarkly flag code references
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -10,11 +15,25 @@ jobs:
     name: LaunchDarkly Code References
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 11 # This value must be set if the lookback configuration option is not disabled for find-code-references. Read more: https://github.com/launchdarkly/ld-find-code-refs#searching-for-unused-flags-extinctions
-    - name: LaunchDarkly Code References
-      uses: launchdarkly/find-code-references@v2.14.0
-      with:
-        accessToken: ${{ secrets.LD_ACCESS_TOKEN }}
-        projKey: arif-test-project
+      - uses: actions/checkout@v4
+        with:
+          # Lookback is 10 by default in the action; fetch at least lookback+1 commits
+          fetch-depth: 11
+
+      # Sanity-check that the scanner config file is present in the workspace
+      - name: Show Code Refs config
+        run: |
+          echo "--- .launchdarkly/coderefs.yaml ---"
+          test -f .launchdarkly/coderefs.yaml && cat .launchdarkly/coderefs.yaml || (echo "MISSING .launchdarkly/coderefs.yaml" && exit 1)
+
+      - name: LaunchDarkly Code References
+        uses: launchdarkly/find-code-references@v2.14.0
+        env:
+          # Enable verbose logs inside the action (avoids the "debug option unknown" warning)
+          LD_DEBUG: trace
+        with:
+          accessToken: ${{ secrets.LD_ACCESS_TOKEN }}
+          projKey: arif-test-project
+          repoName: react_qr_app_ld_beginners
+          contextLines: 2
+          prune: false
