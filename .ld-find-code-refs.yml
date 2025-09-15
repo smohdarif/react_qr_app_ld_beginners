@@ -1,0 +1,5 @@
+projects:
+  - key: arif-test-project   # 👈 replace with your LaunchDarkly project key
+    dir: .
+    aliases:
+      - type: camelcase        # maps kebab-case flag keys ↔ camelCase usages
