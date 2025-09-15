@@ -1,26 +1,9 @@
-# LaunchDarkly Code Refs configuration (read by ld-find-code-refs)
-
-# Show a little context around matches in the LD UI
-contextLines: 2
-
-# Teach the scanner how flags appear in your React code
 aliases:
-  # Map kebab-case keys in LD (release-heart) <-> camelCase in React (releaseHeart)
   - type: camelcase
-
-  # Match property access like: flags.releaseHeart  (also matches optional chaining flags?.releaseHeart)
-  - type: regex
-    pattern: 'flags\\??\\.([A-Za-z0-9_]+)'
-    subst: '$1'
-
-  # Match destructuring from useFlags():  const { releaseHeart } = useFlags()
-  - type: regex
-    pattern: '\\{\\s*([A-Za-z0-9_]+)\\s*\\}\\s*=\\s*useFlags\\s*\\('
-    subst: '$1'
-
-  # (Optional but handy) match arbitrary object.prop -> takes the prop name as a candidate
-  # Useful if you sometimes rename "flags" (e.g., const { flags: f } = props; f.releaseHeart)
-  - type: regex
-    pattern: '(?:^|[^A-Za-z0-9_])([A-Za-z0-9_]+)\\.([A-Za-z0-9_]+)'
-    subst: '$2'
-    
+  - type: filepattern
+    paths:
+      - "src/**/*.{js,jsx,ts,tsx}"
+    # Example: capture variables that are assigned the exact flag string
+    # (the tool substitutes each flag key for FLAG_KEY)
+    patterns:
+      - '(\\w+)\\s*=\\s*"FLAG_KEY"'
