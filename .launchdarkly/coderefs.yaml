@@ -1,25 +1,26 @@
-# This file is read by ld-find-code-refs.
-# We keep 'projKey' supplied by the Action input, so we DO NOT put 'projects:' here
-# (that would conflict with --projKey).
+# LaunchDarkly Code Refs configuration (read by ld-find-code-refs)
 
-# Optional but recommended – tighten false positives only if you want:
-# delimiters:
-#   disableDefaults: false
+# Show a little context around matches in the LD UI
+contextLines: 2
 
-# Aliases visible to the scanner:
+# Teach the scanner how flags appear in your React code
 aliases:
-  # Map kebab-case flag keys to camelCase React usages (release-heart ↔ releaseHeart)
+  # Map kebab-case keys in LD (release-heart) <-> camelCase in React (releaseHeart)
   - type: camelcase
 
-  # Match code like: flags.releaseHeart
+  # Match property access like: flags.releaseHeart  (also matches optional chaining flags?.releaseHeart)
   - type: regex
-    pattern: 'flags\\.([A-Za-z0-9_]+)'
+    pattern: 'flags\\??\\.([A-Za-z0-9_]+)'
     subst: '$1'
 
-  # (Optional) If you sometimes rename 'flags' (e.g., const { flags: f } = props; f.releaseHeart):
-  # - type: regex
-  #   pattern: '(?:^|[^A-Za-z0-9_])([A-Za-z0-9_]+)\\.([A-Za-z0-9_]+)'
-  #   subst: '$2'
+  # Match destructuring from useFlags():  const { releaseHeart } = useFlags()
+  - type: regex
+    pattern: '\\{\\s*([A-Za-z0-9_]+)\\s*\\}\\s*=\\s*useFlags\\s*\\('
+    subst: '$1'
 
-# Nice-to-have UX in LaunchDarkly (shows a little more code around matches)
-contextLines: 2
+  # (Optional but handy) match arbitrary object.prop -> takes the prop name as a candidate
+  # Useful if you sometimes rename "flags" (e.g., const { flags: f } = props; f.releaseHeart)
+  - type: regex
+    pattern: '(?:^|[^A-Za-z0-9_])([A-Za-z0-9_]+)\\.([A-Za-z0-9_]+)'
+    subst: '$2'
+    
