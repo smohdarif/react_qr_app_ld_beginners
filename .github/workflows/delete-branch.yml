@@ -1,0 +1,28 @@
+name: Delete code references branch
+
+on: 
+  delete:  # Triggers when branches/tags are deleted
+
+jobs:
+  branch-delete:
+    runs-on: ubuntu-latest
+    # Only run for branch deletions (not tag deletions)
+    if: github.event.ref_type == 'branch'
+    
+    steps:
+      - name: Delete branch in LaunchDarkly Code Refs (Docker)
+        env:
+          LD_ACCESS_TOKEN: ${{ secrets.LD_ACCESS_TOKEN }}
+          LD_BASE_URI: ${{ vars.LD_BASE_URI }}        # optional for EU/custom domain
+          LD_REPO: ${{ vars.LD_REPO || github.event.repository.name }}
+        run: |
+          branch_json=$(jq -cn --arg ref "${{ github.event.ref }}" '[ $ref ]')
+          docker run --rm \
+            -e LD_ACCESS_TOKEN="$LD_ACCESS_TOKEN" \
+            -e LD_REPO="$LD_REPO" \
+            launchdarkly/ldcli:1.18.0 \
+            code-refs delete-branches \
+              --repo "$LD_REPO" \
+              --data "$branch_json" \
+              --access-token "$LD_ACCESS_TOKEN" \
+              ${LD_BASE_URI:+--base-uri "$LD_BASE_URI"}
