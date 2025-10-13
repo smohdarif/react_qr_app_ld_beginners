@@ -12,7 +12,7 @@ Add the SDK as a dependency:
 npm install launchdarkly-react-client-sdk
 ```
 
----
+------
 
 ## 2. Initialize the SDK in Your App
 
