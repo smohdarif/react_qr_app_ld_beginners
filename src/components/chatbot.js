@@ -47,10 +47,15 @@ const chatbot = ({ flags, ldClient }) => {
     if (personality === 'placeholder') {
       return "Error: Bot not found."
     } else {
-      const response = await axios.get(url);
-      return response.data.answer;
+      try {
+        const response = await axios.get(url);
+        return response.data.answer;
+      } catch (error) {
+        console.error("Chatbot API error:", error);
+        // This error will be captured by LaunchDarkly Observability
+        return "Sorry, I couldn't reach my brain right now. The API might be unavailable. Try again later!";
+      }
     }
-    
   }
 
   function URLify(string) {
